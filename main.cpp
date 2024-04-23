@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     mainMenu mm;
     mm.show();
-
+    qDebug()<<"Master commit!!!";
     return a.exec();
 }
 // int main(int argc, char *argv[]) /* 1 */
