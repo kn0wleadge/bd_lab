@@ -9,8 +9,7 @@ private slots:
 private:
     QGridLayout mainMenuLayout;
     QPushButton selectButton;
-    QPushButton addButton;
-    QPushButton editButton;
+    QComboBox user;
     SelectWindow* sWindow;
 public:
     mainMenu(QWidget* parent= nullptr);

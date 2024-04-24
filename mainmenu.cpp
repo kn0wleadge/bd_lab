@@ -8,15 +8,11 @@ mainMenu::mainMenu(QWidget* parent):QWidget(parent)
     selectButton.setText("select");
     selectButton.setFixedWidth(180);
 
-    addButton.setText("add new row");
-    addButton.setFixedWidth(180);
+    user.addItem("fish catch registrator");
 
-    editButton.setText("edit some row");
-    editButton.setFixedWidth(180);
-
+    mainMenuLayout.addWidget(&user);
     mainMenuLayout.addWidget(&selectButton);
-    mainMenuLayout.addWidget(&addButton);
-    mainMenuLayout.addWidget(&editButton);
+
     bool con1 = connect(&selectButton, &QPushButton::clicked, this, &mainMenu::openSelectWindow);
     this->setLayout(&mainMenuLayout);
 }

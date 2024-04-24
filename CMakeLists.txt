@@ -27,6 +27,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         mainmenu.h mainmenu.cpp
         selectwindow.h selectwindow.cpp
         selecttab.h selecttab.cpp
+        user.h user.cpp
+        report.h report.cpp
+        reportgroup.h reportgroup.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
