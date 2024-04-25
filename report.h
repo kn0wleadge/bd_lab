@@ -9,10 +9,11 @@ private:
     QString reportSql;
     Report();
 public:
+    ~Report();
     QString getGuide();
     QString getText();
     QString getSql();
-    Report(QString guide, QString text, QString sql);
+    Report(QString text, QString guide, QString sql);
 };
 
 #endif // REPORT_H

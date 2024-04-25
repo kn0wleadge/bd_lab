@@ -3,6 +3,11 @@
 Report::Report()
 {}
 
+Report::~Report()
+{
+
+}
+
 QString Report::getGuide()
 {
     return this->reportGuide;

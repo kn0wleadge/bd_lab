@@ -7,10 +7,15 @@ class ReportGroup
 {
 private:
     QString tableName;
-    QVector<Report> reports;
+    QVector<Report*> reports;
 
 public:
-    ReportGroup();
+    ~ReportGroup();
+    QString getTableName();
+    QVector<Report*> getReports();
+    void insertReport(QString reportName, QString reportGuide, QString reportSql);
+    ReportGroup(QString name);
+
 };
 
 #endif // REPORTGROUP_H

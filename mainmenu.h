@@ -2,6 +2,7 @@
 #define MAINMENU_H
 #include <QtWidgets>
 #include "selectwindow.h"
+#include "user.h"
 class mainMenu:public QWidget
 {
 private slots:
@@ -9,7 +10,7 @@ private slots:
 private:
     QGridLayout mainMenuLayout;
     QPushButton selectButton;
-    QComboBox user;
+    QComboBox userList;
     SelectWindow* sWindow;
 public:
     mainMenu(QWidget* parent= nullptr);

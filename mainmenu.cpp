@@ -8,9 +8,9 @@ mainMenu::mainMenu(QWidget* parent):QWidget(parent)
     selectButton.setText("select");
     selectButton.setFixedWidth(180);
 
-    user.addItem("fish catch registrator");
+    userList.addItem("fish catch registrator");
 
-    mainMenuLayout.addWidget(&user);
+    mainMenuLayout.addWidget(&userList);
     mainMenuLayout.addWidget(&selectButton);
 
     bool con1 = connect(&selectButton, &QPushButton::clicked, this, &mainMenu::openSelectWindow);
@@ -18,7 +18,8 @@ mainMenu::mainMenu(QWidget* parent):QWidget(parent)
 }
 void mainMenu::openSelectWindow()
 {
+    User* user = new User(this->userList.currentText());
     qDebug()<<"open select window";
-    sWindow = new SelectWindow();
+    sWindow = new SelectWindow(user,nullptr);
     sWindow->show();
 }

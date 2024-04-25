@@ -1,16 +1,21 @@
 #ifndef USER_H
 #define USER_H
 #include <QString>
-enum role{fishCatchRegistrator,admin};
+#include <QStringList>
+#include "reportgroup.h"
+
 class User
 {
 private:
-    role uRole;
+    QString uRole;
     QString userName;
+    QStringList availTables;
+    QVector<ReportGroup*> availReportGroups;
+
 
 public:
 
-    User();
+    User(QString role);
 };
 
 #endif // USER_H

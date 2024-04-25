@@ -80,7 +80,7 @@ void SelectWindow::tablesNameChanged(int n,QString newTableName)
     this->update();
 }
 
-SelectWindow::SelectWindow(QWidget* parent):QTabWidget(parent)
+SelectWindow::SelectWindow(User* user,QWidget* parent):QTabWidget(parent)
 {
     qDebug()<<"cons start";
     this->setGeometry(0,0,800,600);
@@ -88,7 +88,7 @@ SelectWindow::SelectWindow(QWidget* parent):QTabWidget(parent)
     this->setTabShape(QTabWidget::Rounded);
     QIcon icon("V2w4_Uv0_C8.ico");
     this->setWindowIcon(icon);
-    SelectTab* newTab = new SelectTab;
+    SelectTab* newTab = new SelectTab();
     connect(newTab, &SelectTab::newTablePicked, this, &SelectWindow::tablesNameChanged);
     this->addTab(newTab, " Bank ");
     this->addTab(new QWidget, " + ");
@@ -96,6 +96,8 @@ SelectWindow::SelectWindow(QWidget* parent):QTabWidget(parent)
     this->setTabsClosable(1);
     this->tabBar()->setTabButton(1,QTabBar::RightSide, nullptr);
     this->tabBar()->setTabButton(this->count()- 1,QTabBar::LeftSide,nullptr);
+
+    this->user = user;
     connect(this, &SelectWindow::currentChanged, this,&SelectWindow::createNewTab);
     connect(this->tabBar(),&QTabBar::tabCloseRequested,this->tabBar(), &QTabBar::removeTab);
     //connect(this->tabBar(),&QTabBar::tabCloseRequested,this, &QTabWidget::setCurrentIndex);

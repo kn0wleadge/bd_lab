@@ -3,6 +3,7 @@
 #pragma once
 #include <QtWidgets>
 #include <QtSql>
+#include "user.h"
 //под одну категорию пользователей
 class SelectWindow;
 class SelectTab:public QWidget
@@ -19,7 +20,7 @@ private:
 
     QLabel tablesSelectLabel;
     QComboBox* tables;
-
+    User* user;
     QLabel searchByLabel;
     QComboBox* headers;
     QLineEdit* searchValue;
