@@ -7,27 +7,30 @@ SelectTab::SelectTab()
     if (!SelectTab::db.isOpen())
         initDatabase();
 
-    tablesSelectLabel.setText("Select table");
+    tablesSelectLabel.setText("select table");
     this->selectLayout.addWidget(&tablesSelectLabel);
-
+    user = new User("fish catch registrator");
     tables = new QComboBox;
-    tables->addItems(db.tables());
+    tables->addItems(user->getAvailTables());
     this->selectLayout.addWidget(tables);
-
-    headers = new QComboBox;
+    qDebug()<<"created user";
 
     bdModel = new QSqlTableModel(nullptr,db);
-
+    reports = new QComboBox;
     setNewTable(0);
 
     setNewHeaders(0);
 
-    searchByLabel.setText("Search by");
+    searchByLabel.setText("Select report");
     this->selectLayout.addWidget(&searchByLabel);
 
-    headers = new QComboBox;
-    headers->addItems(columnsNames);
-    this->selectLayout.addWidget(headers);
+    reports->clear();
+    for (size_t i = 0; i < this->user->getAvailReportGroups().front()->getReports().size();++i)
+    {
+        reports->addItem(this->user->getAvailReportGroups().front()->getReports()[i]->getText());
+    }
+    qDebug()<<"added reports";
+    this->selectLayout.addWidget(reports);
 
     searchValue = new QLineEdit;
     this->selectLayout.addWidget(searchValue);
@@ -81,9 +84,9 @@ void SelectTab::setNewHeaders(int n)
     {
         bdModel->setHeaderData(i,Qt::Horizontal,columnsNames[i]);
     }
-    headers->clear();
+    reports->clear();
 
-    headers->addItems(columnsNames);
+    reports->addItems(columnsNames);
     // for (auto e: columnsNames)
     // {
     //     qDebug()<< e;

@@ -22,7 +22,7 @@ private:
     QComboBox* tables;
     User* user;
     QLabel searchByLabel;
-    QComboBox* headers;
+    QComboBox* reports;
     QLineEdit* searchValue;
 
     QSqlTableModel* bdModel;

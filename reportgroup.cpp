@@ -19,7 +19,7 @@ QVector<Report*> ReportGroup::getReports()
     return this->reports;
 }
 
-void ReportGroup::insertReport(QString reportName, QString reportGuide, QString reportSql)
+void ReportGroup::insertReport(QString reportName, QStringList reportGuide, QString reportSql)
 {
     Report* newReport = new Report(reportName, reportGuide, reportSql);
 

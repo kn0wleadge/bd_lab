@@ -8,7 +8,7 @@ Report::~Report()
 
 }
 
-QString Report::getGuide()
+QStringList Report::getGuide()
 {
     return this->reportGuide;
 }
@@ -23,7 +23,7 @@ QString Report::getSql()
     return this->reportSql;
 }
 
-Report::Report(QString guide, QString text, QString sql):reportGuide(guide), reportText(text), reportSql(sql)
+Report::Report(QString text,QStringList guide,  QString sql):reportGuide(guide), reportText(text), reportSql(sql)
 {
 
 }

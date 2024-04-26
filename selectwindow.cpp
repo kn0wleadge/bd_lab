@@ -1,48 +1,6 @@
 #include "selectwindow.h"
 
 
-
-// void SelectWindow::setNewHeaders(int n)
-// {
-//     QSqlRecord record = db.record(tables->itemText(n));
-//     int fieldsCount = record.count();
-//     QStringList columnsNames;
-//     for (size_t i = 0; i < fieldsCount; ++i)
-//     {
-//         columnsNames.append(record.fieldName(i));
-//     }
-//     for (size_t i = 0;i < columnsNames.size();++i)
-//     {
-//         bdModel->setHeaderData(i,Qt::Horizontal,columnsNames[i]);
-//     }
-//     headers = new QComboBox;
-//     headers->addItems(columnsNames);
-// }
-// void SelectWindow::initTab(int n)
-// {
-//     this->widget(n)->
-// }
-// void SelectWindow::setNewTable(int n)
-// {
-//     bdModel->setTable(tables->itemText(n));
-//     bdModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-//     bdModel->select();
-// }
-
-// void SelectWindow::initDatabase()
-
-// {
-//     db = QSqlDatabase::addDatabase("QMYSQL");
-//     db.setDatabaseName("mydb");
-//     db.setHostName("localhost");
-//     db.setUserName("root");
-//     db.setPassword("Kapibara228");
-//     if (!db.open())
-//     {
-//         qDebug()<<"db not opened";
-//         qDebug()<<db.lastError();
-//     }
-// }
 void SelectWindow::createNewTab(int n)
 {
     qDebug()<<"Enter new tab create";
@@ -84,7 +42,7 @@ SelectWindow::SelectWindow(User* user,QWidget* parent):QTabWidget(parent)
 {
     qDebug()<<"cons start";
     this->setGeometry(0,0,800,600);
-    this->setWindowTitle("Select section");
+    this->setWindowTitle("Report window");
     this->setTabShape(QTabWidget::Rounded);
     QIcon icon("V2w4_Uv0_C8.ico");
     this->setWindowIcon(icon);
