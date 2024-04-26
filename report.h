@@ -7,6 +7,7 @@ private:
     QString reportGuide;
     QString reportText;
     QString reportSql;
+    int paramsQ;
     Report();
 public:
     ~Report();
