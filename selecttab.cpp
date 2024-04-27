@@ -9,49 +9,63 @@ SelectTab::SelectTab()
 
     tablesSelectLabel.setText("select table");
     this->selectLayout.addWidget(&tablesSelectLabel);
+
     user = new User("fish catch registrator");
+
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
     this->selectLayout.addWidget(tables);
     qDebug()<<"created user";
 
-    bdModel = new QSqlTableModel(nullptr,db);
+    model = new QSqlQueryModel;
+    model->setQuery("select * from bank");
+
     reports = new QComboBox;
-    setNewTable(0);
 
-    setNewHeaders(0);
+    setNewReports("bank");
 
-    searchByLabel.setText("Select report");
-    this->selectLayout.addWidget(&searchByLabel);
-
-    reports->clear();
-    for (size_t i = 0; i < this->user->getAvailReportGroups().front()->getReports().size();++i)
-    {
-        reports->addItem(this->user->getAvailReportGroups().front()->getReports()[i]->getText());
-    }
     qDebug()<<"added reports";
     this->selectLayout.addWidget(reports);
 
-    searchValue = new QLineEdit;
-    this->selectLayout.addWidget(searchValue);
-
     bdView = new QTableView;
-    bdView->setModel(bdModel);
+    bdView->setModel(model);
     bdView->verticalHeader()->hide();
     bdView->setColumnWidth(0,150);
 
     this->selectLayout.addWidget(bdView);
     this->setLayout(&selectLayout);
 
-    connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::tableChanged);
+    connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
+    connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
     connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::emitTableChanged);
 }
-void SelectTab::tableChanged(int n)
+void SelectTab::tableChanged(QString name)
 {
     qDebug()<<"slot";
-    setNewHeaders(n);
-    setNewTable(n);
+    this->model->clear();
+    setNewReports(name);
     this->update();
+}
+
+void SelectTab::reportChanged(int n)
+{
+    qDebug()<<"report changed";
+    qDebug()<<n;
+    if (n != -1)
+    {
+    QVector<Report*> reports;
+    //looking throw all report groups
+    for (auto& e: this->user->getAvailReportGroups())
+    {
+        if (e->getTableName() == this->tables->currentText())
+        {
+            reports = e->getReports();
+        }
+    }
+    this->model->setQuery(reports[n]->getSql());
+    qDebug()<<reports[n]->getSql();
+    update();
+    }
 }
 
 void SelectTab::emitTableChanged(int n)
@@ -71,31 +85,39 @@ void SelectTab::initDatabase()
         qDebug()<<db.lastError();
     }
 }
-void SelectTab::setNewHeaders(int n)
+void SelectTab::setNewReports(QString name)
 {
-    QSqlRecord record = db.record(tables->itemText(n));
-    int fieldsCount = record.count();
-    columnsNames.clear();
-    for (size_t i = 0; i < fieldsCount; ++i)
-    {
-        columnsNames.append(record.fieldName(i));
-    }
-    for (size_t i = 0;i < columnsNames.size();++i)
-    {
-        bdModel->setHeaderData(i,Qt::Horizontal,columnsNames[i]);
-    }
-    reports->clear();
 
-    reports->addItems(columnsNames);
+
+    QVector<Report*> newReports;
+    //looking throw all report groups
+    for (auto& e: this->user->getAvailReportGroups())
+    {
+        if (e->getTableName() == name)
+        {
+            newReports = e->getReports();
+        }
+    }
+
+    reports->clear();
+    for (auto& e: newReports)
+    {
+        reports->addItem(e->getText());
+    }
+    //disconnect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
+    this->reports->setCurrentIndex(-1);
+    //connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
+    this->reports->setPlaceholderText("Select report");
+    this->update();
     // for (auto e: columnsNames)
     // {
     //     qDebug()<< e;
     //     qDebug()<<headers->
     // }
 }
-void SelectTab::setNewTable(int n)
+void SelectTab::setNewTable(QString name)
 {
-    bdModel->setTable(tables->itemText(n));
-    bdModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    bdModel->select();
+    // bdModel->setTable(tables->itemText(n));
+    // bdModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    // bdModel->select();
 }
