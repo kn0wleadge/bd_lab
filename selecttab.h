@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include <QtSql>
 #include "user.h"
+#include "paramsenterwidget.h"
 //под одну категорию пользователей
 class SelectWindow;
 class SelectTab:public QWidget
@@ -13,6 +14,8 @@ private slots:
     void tableChanged(QString name);
     void reportChanged(int n);
     void emitTableChanged(int n);
+    void executeQuery(QStringList paramsList);
+
 signals:
     void newTablePicked(int n,QString newTableName);
 private:
@@ -25,7 +28,11 @@ private:
     User* user;
     QLabel searchByLabel;
     QComboBox* reports;
+    QWidget* paramsEnter;
 
+    QString queryBuffer;
+
+    ParamsEnterWidget* paramsWindow;
 
     QSqlTableModel* bdModel;
     static QSqlDatabase db;

@@ -12,13 +12,13 @@ SelectTab::SelectTab()
 
     user = new User("fish catch registrator");
 
+    paramsEnter =
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
     this->selectLayout.addWidget(tables);
     qDebug()<<"created user";
 
     model = new QSqlQueryModel;
-    model->setQuery("select * from bank");
 
     reports = new QComboBox;
 
@@ -51,9 +51,12 @@ void SelectTab::reportChanged(int n)
 {
     qDebug()<<"report changed";
     qDebug()<<n;
+    //if it's true query
     if (n != -1)
     {
+
     QVector<Report*> reports;
+
     //looking throw all report groups
     for (auto& e: this->user->getAvailReportGroups())
     {
@@ -62,8 +65,25 @@ void SelectTab::reportChanged(int n)
             reports = e->getReports();
         }
     }
-    this->model->setQuery(reports[n]->getSql());
-    qDebug()<<reports[n]->getSql();
+    QStringList newReportInputGuides = reports[n]->getGuide();
+
+    //if there are some params in query - call params window
+    if (newReportInputGuides.size() > 0)
+    {
+        paramsWindow = new ParamsEnterWidget(newReportInputGuides);
+        bool c = connect (paramsWindow, &ParamsEnterWidget::paramsEntered, this, &SelectTab::executeQuery);
+        qDebug()<< c;
+        paramsWindow->show();
+        queryBuffer = reports[n]->getSql();
+    }
+
+    //if there are no params in query - execute it instantly
+    else
+    {
+        this->model->setQuery(reports[n]->getSql());
+        qDebug()<<reports[n]->getSql();
+    }
+
     update();
     }
 }
@@ -71,6 +91,13 @@ void SelectTab::reportChanged(int n)
 void SelectTab::emitTableChanged(int n)
 {
     emit newTablePicked(n, this->tables->currentText());
+}
+
+void SelectTab::executeQuery(QStringList paramsList)
+{
+    qDebug()<<"executing query";
+    qDebug()<<queryBuffer;
+    this->model->setQuery(queryBuffer);
 }
 void SelectTab::initDatabase()
 {
@@ -104,16 +131,10 @@ void SelectTab::setNewReports(QString name)
     {
         reports->addItem(e->getText());
     }
-    //disconnect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
     this->reports->setCurrentIndex(-1);
-    //connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
     this->reports->setPlaceholderText("Select report");
     this->update();
-    // for (auto e: columnsNames)
-    // {
-    //     qDebug()<< e;
-    //     qDebug()<<headers->
-    // }
+
 }
 void SelectTab::setNewTable(QString name)
 {
