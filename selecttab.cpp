@@ -12,7 +12,7 @@ SelectTab::SelectTab()
 
     user = new User("fish catch registrator");
 
-    paramsEnter =
+    paramsQuery = new QSqlQuery(db);
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
     this->selectLayout.addWidget(tables);
@@ -97,7 +97,22 @@ void SelectTab::executeQuery(QStringList paramsList)
 {
     qDebug()<<"executing query";
     qDebug()<<queryBuffer;
-    this->model->setQuery(queryBuffer);
+    int bindValues = queryBuffer.count("?");
+    qDebug()<<"Num of bind value - " << bindValues;
+    paramsQuery->prepare(queryBuffer);
+    for (size_t i = 0; i < paramsList.size(); ++i)
+    {
+        paramsQuery->bindValue(i,paramsList[i]);
+    }
+    paramsQuery->exec();
+    qDebug()<<paramsQuery->lastError();
+    QVariantList list = paramsQuery->boundValues();
+    for (auto &e: list)
+    {
+        qDebug() << e.toString();
+    }
+    this->model->setQuery(*paramsQuery);
+    qDebug()<< this->model->lastError();
 }
 void SelectTab::initDatabase()
 {

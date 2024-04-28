@@ -22,6 +22,7 @@ private:
     QGridLayout selectLayout;
     QTableView* bdView;
     QSqlQueryModel* model;
+    QSqlQuery* paramsQuery;
 
     QLabel tablesSelectLabel;
     QComboBox* tables;

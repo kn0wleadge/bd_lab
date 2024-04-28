@@ -54,28 +54,28 @@ User::User(QString role)
         bankGroup->insertReport("Вывести информацию о всех банках",QStringList(),"select * from bank;");
         bankGroup->insertReport("Запрос на получение списка членов экипажа с определенного рейса",
                                 QStringList() << "Введите номер рейса",
-                                "select CNum as 'Номер члена экипажа', CName as 'ФИО' from crew where VNum = 3 ;"
+                                "select CNum as 'Номер члена экипажа', CName as 'ФИО' from crew where VNum = ? ;"
                                 );
         bankGroup->insertReport("Запрос на получение информации о банке, где больше всего рыбы определенного вида",
                                 QStringList() << "Введите название рыбы",
-                                "select  BName as 'Название банки', Cords as 'Местоположение'"
-                                "from bank"
-                                "where BNum = (select BNum from fish where Quantity = (select max(Quantity) from fish where FishName = 'Carp') and FishName = 'Carp');"
+                                "select  BName as 'Название банки', Cords as 'Местоположение' "
+                                "from bank "
+                                "where BNum = (select BNum from fish where Quantity = (select max(Quantity) from fish where FishName = ?));"
                                 );
         bankGroup->insertReport("Запрос на получение суммарного улова за всей рейсы, в которые траулеры вышли в определенный период",
                                 QStringList() << "Введите дату отплытия" << "Введите дату ",
                                " select VDate as 'Дата отправления', Retdate as 'Дата прибытия', sum(fishQuantity) as 'Суммарное количество пойманной рыбы' , trawler.TName"
-                                   " from voyage, fishCatch, trawler"
-                                    "where fishCatch.resNum in (select resNum from fishingSessionRes where DepDate between '2024-03-19' and '2024-05-17' )"
-                                        "and voyage.VDate between '2024-03-19' and '2024-05-17'"
-                                            "and trawler.TNum = voyage.TNum"
+                                   " from voyage, fishCatch, trawler "
+                                    "where fishCatch.resNum in (select resNum from fishingSessionRes where DepDate between '2024-03-19' and '2024-05-17' ) "
+                                        "and voyage.VDate between '2024-03-19' and '2024-05-17' "
+                                            "and trawler.TNum = voyage.TNum "
                                       "group by VDate, Retdate, trawler.TName;"
 
                                 );
         bankGroup->insertReport("Запрос на самую получение информации о рыбе, которая распространена больше всего в определенной банке",
                                 QStringList() << "Введите название банки",
-                                "select FishName as 'Название рыбы', max(Quantity) as 'Количество особей', BName as'Название банки'"
-                               " from fish natural join bank"
+                                "select FishName as 'Название рыбы', max(Quantity) as 'Количество особей', BName as'Название банки' "
+                               " from fish natural join bank "
                                "     where BName = 'Big Fish bank';"
                                 );
         bankGroup->insertReport("Запрос на получение информации об общем количестве выловленной щуки за все рейсы",
@@ -95,24 +95,24 @@ User::User(QString role)
                                 );
         fishGroup->insertReport("Запрос на получение информации о банке, где больше всего рыбы определенного вида",
                                 QStringList() << "Введите название рыбы",
-                                "select  BName as 'Название банки', Cords as 'Местоположение'"
-                                "from bank"
+                                "select  BName as 'Название банки', Cords as 'Местоположение' "
+                                "from bank "
                                 "where BNum = (select BNum from fish where Quantity = (select max(Quantity) from fish where FishName = 'Carp') and FishName = 'Carp');"
                                 );
         fishGroup->insertReport("Запрос на получение суммарного улова за всей рейсы, в которые траулеры вышли в определенный период",
                                 QStringList() << "Введите дату отплытия" << "Введите дату ",
                                 " select VDate as 'Дата отправления', Retdate as 'Дата прибытия', sum(fishQuantity) as 'Суммарное количество пойманной рыбы' , trawler.TName"
-                                " from voyage, fishCatch, trawler"
-                                "where fishCatch.resNum in (select resNum from fishingSessionRes where DepDate between '2024-03-19' and '2024-05-17' )"
-                                "and voyage.VDate between '2024-03-19' and '2024-05-17'"
-                                "and trawler.TNum = voyage.TNum"
+                                " from voyage, fishCatch, trawler "
+                                "where fishCatch.resNum in (select resNum from fishingSessionRes where DepDate between '2024-03-19' and '2024-05-17' ) "
+                                "and voyage.VDate between '2024-03-19' and '2024-05-17' "
+                                "and trawler.TNum = voyage.TNum "
                                 "group by VDate, Retdate, trawler.TName;"
 
                                 );
         fishGroup->insertReport("Запрос на самую получение информации о рыбе, которая распространена больше всего в определенной банке",
                                 QStringList() << "Введите название банки",
-                                "select FishName as 'Название рыбы', max(Quantity) as 'Количество особей', BName as'Название банки'"
-                                " from fish natural join bank"
+                                "select FishName as 'Название рыбы', max(Quantity) as 'Количество особей', BName as'Название банки' "
+                                " from fish natural join bank "
                                 "     where BName = 'Big Fish bank';"
                                 );
         fishGroup->insertReport("Запрос на получение информации об общем количестве выловленной щуки за все рейсы",
