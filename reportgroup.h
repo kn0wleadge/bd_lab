@@ -13,7 +13,7 @@ public:
     ~ReportGroup();
     QString getTableName();
     QVector<Report*> getReports();
-    void insertReport(QString reportName, QStringList reportGuide, QString reportSql);
+    void insertReport(QString reportName, QStringList reportGuide, QString reportSql, QStringList reportParams = QStringList());
     ReportGroup(QString name);
 
 };

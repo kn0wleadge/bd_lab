@@ -57,7 +57,7 @@ void SelectTab::reportChanged(int n)
 
     QVector<Report*> reports;
 
-    //looking throw all report groups
+    //looking throw all report groups and get current reports
     for (auto& e: this->user->getAvailReportGroups())
     {
         if (e->getTableName() == this->tables->currentText())
@@ -65,6 +65,8 @@ void SelectTab::reportChanged(int n)
             reports = e->getReports();
         }
     }
+
+    //get reports data input guides
     QStringList newReportInputGuides = reports[n]->getGuide();
 
     //if there are some params in query - call params window
@@ -97,13 +99,29 @@ void SelectTab::executeQuery(QStringList paramsList)
 {
     qDebug()<<"executing query";
     qDebug()<<queryBuffer;
-    int bindValues = queryBuffer.count("?");
+    int bindValues = queryBuffer.count(":");
     qDebug()<<"Num of bind value - " << bindValues;
-    paramsQuery->prepare(queryBuffer);
-    for (size_t i = 0; i < paramsList.size(); ++i)
+    QVector<Report*> reports;
+
+    //looking throw all report groups and get current reports
+    for (auto& e: this->user->getAvailReportGroups())
     {
-        paramsQuery->bindValue(i,paramsList[i]);
+        if (e->getTableName() == this->tables->currentText())
+        {
+            reports = e->getReports();
+        }
     }
+
+    QStringList params = reports[this->reports->currentIndex()]->getParamsNameList();
+    qDebug()<< "preparing query";
+    paramsQuery->prepare(queryBuffer);
+    for (size_t i = 0; i < paramsList.size() ; ++i)
+    {
+        paramsQuery->bindValue(params[i], paramsList[i]);
+    }
+
+
+
     paramsQuery->exec();
     qDebug()<<paramsQuery->lastError();
     QVariantList list = paramsQuery->boundValues();

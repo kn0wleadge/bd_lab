@@ -8,6 +8,11 @@ Report::~Report()
 
 }
 
+QStringList Report::getParamsNameList()
+{
+    return this->paramsNameList;
+}
+
 QStringList Report::getGuide()
 {
     return this->reportGuide;
@@ -23,7 +28,7 @@ QString Report::getSql()
     return this->reportSql;
 }
 
-Report::Report(QString text,QStringList guide,  QString sql):reportGuide(guide), reportText(text), reportSql(sql)
+Report::Report(QString text,QStringList guide,  QString sql, QStringList params):reportGuide(guide), reportText(text), reportSql(sql), paramsNameList(params)
 {
 
 }
