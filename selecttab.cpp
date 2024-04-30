@@ -37,6 +37,7 @@ SelectTab::SelectTab()
 
     connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
     connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
+    connect(reports, &QComboBox::activated, this,&SelectTab::reportChanged );
     connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::emitTableChanged);
 }
 void SelectTab::tableChanged(QString name)
@@ -123,7 +124,20 @@ void SelectTab::executeQuery(QStringList paramsList)
 
 
     paramsQuery->exec();
-    qDebug()<<paramsQuery->lastError();
+    if( paramsQuery->size() == 0)
+    {
+        int n = QMessageBox::warning(0,
+                                     "Warning",
+                                     "Query result is empty",
+
+                                     QMessageBox::Ok
+                                     );
+        paramsWindow->close();
+        qDebug()<<paramsQuery->lastError();
+        return;
+    }
+
+
     QVariantList list = paramsQuery->boundValues();
     for (auto &e: list)
     {
