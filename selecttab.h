@@ -6,7 +6,6 @@
 #include "user.h"
 #include "paramsenterwidget.h"
 //под одну категорию пользователей
-class SelectWindow;
 class SelectTab:public QWidget
 {
     Q_OBJECT
@@ -15,9 +14,12 @@ private slots:
     void reportChanged(int n);
     void emitTableChanged(int n);
     void executeQuery(QStringList paramsList);
+    void emitQueryRecalled(int n);
 
 signals:
     void newTablePicked(int n,QString newTableName);
+    void queryRecalled(int n);
+
 private:
     QGridLayout selectLayout;
     QTableView* bdView;
@@ -40,6 +42,7 @@ private:
 
     QStringList columnsNames;
 
+    QPushButton* recallQuery;
     void setNewReports(QString name);
     void setNewTable(QString name);
     void initDatabase();

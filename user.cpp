@@ -78,9 +78,11 @@ User::User(QString role)
                                 );
         bankGroup->insertReport("Запрос на самую получение информации о рыбе, которая распространена больше всего в определенной банке",
                                 QStringList() << "Введите название банки",
-                                "select FishName as 'Название рыбы', max(Quantity) as 'Количество особей', BName as'Название банки' "
-                               " from fish natural join bank "
-                               "     where BName = :bname ;",
+                                "select FishName as 'Название рыбы',Quantity as 'Количество рыбы', BName as'Название банки' "
+                                "from fish, bank "
+                                    "where fish.BNum = bank.BNum "
+                                      "and bank.BName = :bname "
+                                      "and fish.Quantity = (select max(Quantity) from fish where fish.BNum = (select bank.BNum where BName = :bname)); ",
                                 QStringList() << ":bname"
                                 );
         bankGroup->insertReport("Запрос на получение информации об общем количестве выловленной щуки за все рейсы",

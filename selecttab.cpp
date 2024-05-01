@@ -6,26 +6,30 @@ SelectTab::SelectTab()
     qDebug()<< "started creating new tab";
     if (!SelectTab::db.isOpen())
         initDatabase();
-
     tablesSelectLabel.setText("select table");
-    this->selectLayout.addWidget(&tablesSelectLabel);
+    this->selectLayout.addWidget(&tablesSelectLabel,0,0);
 
     user = new User("fish catch registrator");
 
     paramsQuery = new QSqlQuery(db);
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
-    this->selectLayout.addWidget(tables);
+    this->selectLayout.addWidget(tables,1,0);
     qDebug()<<"created user";
 
     model = new QSqlQueryModel;
 
     reports = new QComboBox;
-
     setNewReports("bank");
+    recallQuery = new QPushButton;
+    recallQuery->setIcon(QIcon("recallQuery.ico"));
+    recallQuery->setFixedSize(25,25);
 
     qDebug()<<"added reports";
-    this->selectLayout.addWidget(reports);
+    QHBoxLayout* reportsAndButton = new QHBoxLayout;
+    reportsAndButton->addWidget(reports);
+    reportsAndButton->addWidget(recallQuery);
+    this->selectLayout.addLayout(reportsAndButton,2,0);
 
     bdView = new QTableView;
     bdView->setModel(model);
@@ -37,8 +41,9 @@ SelectTab::SelectTab()
 
     connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
     connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
-    connect(reports, &QComboBox::activated, this,&SelectTab::reportChanged );
     connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::emitTableChanged);
+    connect(recallQuery, &QPushButton::clicked, this, &SelectTab::emitQueryRecalled);
+    connect(this, &SelectTab::queryRecalled, this, &SelectTab::reportChanged);
 }
 void SelectTab::tableChanged(QString name)
 {
@@ -121,9 +126,9 @@ void SelectTab::executeQuery(QStringList paramsList)
         paramsQuery->bindValue(params[i], paramsList[i]);
     }
 
-
-
     paramsQuery->exec();
+
+    //if query result is empty
     if( paramsQuery->size() == 0)
     {
         int n = QMessageBox::warning(0,
@@ -145,6 +150,11 @@ void SelectTab::executeQuery(QStringList paramsList)
     }
     this->model->setQuery(*paramsQuery);
     qDebug()<< this->model->lastError();
+}
+
+void SelectTab::emitQueryRecalled(int n)
+{
+    emit this->queryRecalled(this->reports->currentIndex());
 }
 void SelectTab::initDatabase()
 {
