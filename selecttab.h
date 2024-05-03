@@ -5,6 +5,7 @@
 #include <QtSql>
 #include "user.h"
 #include "paramsenterwidget.h"
+#include "addwindow.h"
 //под одну категорию пользователей
 class SelectTab:public QWidget
 {
@@ -12,11 +13,15 @@ class SelectTab:public QWidget
 private slots:
     void tableChanged(QString name);
     void reportChanged(int n);
-    void emitTableChanged(int n);
     void executeQuery(QStringList paramsList);
+    void openAddWindow(QString currentTableName);
+
+    void emitTableChanged(int n);
     void emitQueryRecalled(int n);
+    void emitOpenAddWindow();
 
 signals:
+    void addWindowButtonClicked(QString currentTableName);
     void newTablePicked(int n,QString newTableName);
     void queryRecalled(int n);
 

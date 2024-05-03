@@ -31,6 +31,11 @@ SelectTab::SelectTab()
     reportsAndButton->addWidget(recallQuery);
     this->selectLayout.addLayout(reportsAndButton,2,0);
 
+    //button for opening add/edit/delete window
+    QPushButton* addButton = new QPushButton("add/delete/edit ");
+    this->selectLayout.addWidget(addButton,3,0);
+
+
     bdView = new QTableView;
     bdView->setModel(model);
     bdView->verticalHeader()->hide();
@@ -39,11 +44,14 @@ SelectTab::SelectTab()
     this->selectLayout.addWidget(bdView);
     this->setLayout(&selectLayout);
 
+
     connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
     connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
     connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::emitTableChanged);
     connect(recallQuery, &QPushButton::clicked, this, &SelectTab::emitQueryRecalled);
     connect(this, &SelectTab::queryRecalled, this, &SelectTab::reportChanged);
+    connect(addButton, &QPushButton::clicked, this, &SelectTab::emitOpenAddWindow);
+    connect(this, &SelectTab::addWindowButtonClicked, this, &SelectTab::openAddWindow);
 }
 void SelectTab::tableChanged(QString name)
 {
@@ -57,7 +65,8 @@ void SelectTab::reportChanged(int n)
 {
     qDebug()<<"report changed";
     qDebug()<<n;
-    //if it's true query
+
+    //if it's real query
     if (n != -1)
     {
 
@@ -152,9 +161,20 @@ void SelectTab::executeQuery(QStringList paramsList)
     qDebug()<< this->model->lastError();
 }
 
+void SelectTab::openAddWindow(QString currentTableName)
+{
+    AddWindow* newAddWindow = new AddWindow(QStringList());
+    newAddWindow->show();
+}
+
 void SelectTab::emitQueryRecalled(int n)
 {
     emit this->queryRecalled(this->reports->currentIndex());
+}
+
+void SelectTab::emitOpenAddWindow()
+{
+    emit this->addWindowButtonClicked(this->tables->currentText());
 }
 void SelectTab::initDatabase()
 {

@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         report.h report.cpp
         reportgroup.h reportgroup.cpp
         paramsenterwidget.h paramsenterwidget.cpp
+        addwindow.h addwindow.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
