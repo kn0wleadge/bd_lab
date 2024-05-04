@@ -10,7 +10,66 @@ SelectTab::SelectTab()
     this->selectLayout.addWidget(&tablesSelectLabel,0,0);
 
     user = new User("fish catch registrator");
-
+    //getting columns data types for users' available types
+    for (size_t i = 0; i < user->getAvailTables().size(); ++i)
+    {
+        if (user->getAvailTables()[i] == "bank")
+        {
+            QString tableName = "bank";
+            QStringList columnType;
+            columnType << "int" << "str" << "str";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "employee")
+        {
+            QString tableName = "employee";
+            QStringList columnType;
+            columnType << "int" << "str" << "str" << "str";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "fish")
+        {
+            QString tableName = "fish";
+            QStringList columnType;
+            columnType << "str" << "int" << "int";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "fishCatch")
+        {
+            QString tableName = "fishCatch";
+            QStringList columnType;
+            columnType << "str" << "int" << "int" << "str";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "fishingSessionRes")
+        {
+            QString tableName = "fishingSessionRes";
+            QStringList columnType;
+            columnType << "int" << "int" << "str" << "str" << "str" << "int";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "trawler")
+        {
+            QString tableName = "trawler";
+            QStringList columnType;
+            columnType << "int" << "str" << "int" << "str";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "voyage")
+        {
+            QString tableName = "voyage";
+            QStringList columnType;
+            columnType << "int" << "int" << "str" << "str";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+        else if(user->getAvailTables()[i] == "voyageCrew")
+        {
+            QString tableName = "voyageCrew";
+            QStringList columnType;
+            columnType << "int" << "int";
+            columnsDataTypes.append(std::pair(tableName, columnType));
+        }
+    }
     paramsQuery = new QSqlQuery(db);
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
@@ -44,7 +103,7 @@ SelectTab::SelectTab()
     this->selectLayout.addWidget(bdView);
     this->setLayout(&selectLayout);
 
-
+    qDebug()<<"started connections";
     connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
     connect(reports, &QComboBox::currentIndexChanged, this , &SelectTab::reportChanged);
     connect(tables, &QComboBox::currentIndexChanged, this, &SelectTab::emitTableChanged);
@@ -52,6 +111,8 @@ SelectTab::SelectTab()
     connect(this, &SelectTab::queryRecalled, this, &SelectTab::reportChanged);
     connect(addButton, &QPushButton::clicked, this, &SelectTab::emitOpenAddWindow);
     connect(this, &SelectTab::addWindowButtonClicked, this, &SelectTab::openAddWindow);
+
+    qDebug()<<"tab created";
 }
 void SelectTab::tableChanged(QString name)
 {
@@ -163,8 +224,59 @@ void SelectTab::executeQuery(QStringList paramsList)
 
 void SelectTab::openAddWindow(QString currentTableName)
 {
-    AddWindow* newAddWindow = new AddWindow(QStringList());
-    newAddWindow->show();
+    this->model->setQuery("select * from " + this->tables->currentText());
+    QSqlRecord tempRecord = this->model->record();
+    QStringList columnNames;
+    for (size_t i = 0; i < tempRecord.count(); ++i)
+    {
+        columnNames << tempRecord.fieldName(i);
+    }
+    addWindow = new AddWindow(columnNames);
+    connect(addWindow, &AddWindow::valuesEntered, this, &SelectTab::insertNewRow);
+    addWindow->show();
+}
+
+void SelectTab::insertNewRow(QStringList values)
+{
+    qDebug() << "inserting new row";
+    QStringList columnsTypes;
+    for (auto& e: columnsDataTypes)
+    {
+        if (e.first == tables->currentText())
+        {
+            columnsTypes = e.second;
+            break;
+        }
+    }
+    QString insertQueryText = "insert into " +
+                              this->tables->currentText()
+                               + " values (";
+    //iterating throw all values
+    for (size_t i = 0; i < values.size();++i)
+    {
+        if (columnsTypes[i] == "str")
+        {
+            insertQueryText.push_back("' " + values[i] + " '" + ",");
+        }
+        else if(columnsTypes[i] == "int")
+        {
+            insertQueryText.push_back(values[i] + + " , ");
+        }
+    }
+    insertQueryText.removeLast();
+    insertQueryText.push_back(");");
+    qDebug()<<insertQueryText;
+    this->model->setQuery(insertQueryText);
+    qDebug()<<model->lastError().text();
+    if(!model->lastError().text().isEmpty())
+    {
+        QMessageBox* sqlErrorMsgBox = new QMessageBox(this);
+        sqlErrorMsgBox->setText(model->lastError().text());
+        sqlErrorMsgBox->setInformativeText("Some error due to your row insert");
+        sqlErrorMsgBox->setStandardButtons(QMessageBox::Ok);
+        sqlErrorMsgBox->show();
+
+    }
 }
 
 void SelectTab::emitQueryRecalled(int n)

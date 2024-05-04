@@ -20,12 +20,17 @@ private slots:
     void emitQueryRecalled(int n);
     void emitOpenAddWindow();
 
+    void insertNewRow(QStringList values);
 signals:
     void addWindowButtonClicked(QString currentTableName);
     void newTablePicked(int n,QString newTableName);
     void queryRecalled(int n);
 
 private:
+    // data type for storing information about columns data types
+    QVector<std::pair<QString, QStringList>> columnsDataTypes;
+    AddWindow* addWindow;
+
     QGridLayout selectLayout;
     QTableView* bdView;
     QSqlQueryModel* model;
