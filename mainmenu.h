@@ -8,7 +8,7 @@ class mainMenu:public QWidget
 private slots:
     void openSelectWindow();
 private:
-    QGridLayout mainMenuLayout;
+    QVBoxLayout mainMenuLayout;
     QPushButton selectButton;
     QComboBox userList;
     SelectWindow* sWindow;

@@ -25,7 +25,9 @@ AddWindow::AddWindow(QStringList params)
         newField->setPlaceholderText("Введите " + e);
 
     }
+    okButton.setText("ok");
     layout.addWidget(&okButton);
     connect(&okButton, &QPushButton::clicked, this, &QWidget::close);
     this->setLayout(&layout);
+    this->setGeometry(600,600,300,200);
 }

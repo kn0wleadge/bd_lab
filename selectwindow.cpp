@@ -10,7 +10,7 @@ void SelectWindow::createNewTab(int n)
         SelectTab* newTab = new SelectTab;
         connect(newTab, &SelectTab::newTablePicked, this, &SelectWindow::tablesNameChanged);
 
-        this->addTab(newTab," Bank ");
+        this->addTab(newTab," Банк ");
         disconnect(this, &SelectWindow::currentChanged, this,&SelectWindow::createNewTab);
         this->tabBar()->moveTab(this->count()-1, this->count() - 2);
         this->setCurrentIndex(this->count() - 2);
@@ -41,14 +41,14 @@ void SelectWindow::tablesNameChanged(int n,QString newTableName)
 SelectWindow::SelectWindow(User* user,QWidget* parent):QTabWidget(parent)
 {
     qDebug()<<"cons start";
-    this->setGeometry(0,0,800,600);
-    this->setWindowTitle("Report window");
+    this->setGeometry(600,600,800,600);
+    this->setWindowTitle("Окно отчётов");
     this->setTabShape(QTabWidget::Rounded);
     QIcon icon("V2w4_Uv0_C8.ico");
     this->setWindowIcon(icon);
     SelectTab* newTab = new SelectTab();
     connect(newTab, &SelectTab::newTablePicked, this, &SelectWindow::tablesNameChanged);
-    this->addTab(newTab, " Bank ");
+    this->addTab(newTab, " Банк ");
     this->addTab(new QWidget, " + ");
     this->setMovable(1);
     this->setTabsClosable(1);

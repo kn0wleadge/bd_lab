@@ -4,8 +4,10 @@
 #include <QtWidgets>
 #include <QtSql>
 #include "user.h"
+#include <unordered_map>
 #include "paramsenterwidget.h"
 #include "addwindow.h"
+#include <QThread>
 //под одну категорию пользователей
 class SelectTab:public QWidget
 {
@@ -27,6 +29,10 @@ signals:
     void queryRecalled(int n);
 
 private:
+    static std::unordered_map<QString,QString> columnsNameDictionary;
+    void initColumnsNameDictionary();
+    QString rusTableNameToEng(QString cName);
+    QString engColumnNameToRus(QString cName);
     // data type for storing information about columns data types
     QVector<std::pair<QString, QStringList>> columnsDataTypes;
     AddWindow* addWindow;

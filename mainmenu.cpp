@@ -2,13 +2,14 @@
 
 mainMenu::mainMenu(QWidget* parent):QWidget(parent)
 {
-    this->setGeometry(0,0,400,300);
-    this->setWindowTitle("Database pro");
+    this->setGeometry(600,600,400,300);
+    this->setWindowTitle("Название");
 
-    selectButton.setText("select");
-    selectButton.setFixedWidth(180);
+    selectButton.setText("Ок");
+    selectButton.setFixedSize(60,30);
 
-    userList.addItem("fish catch registrator");
+
+    userList.addItem("Регистратор улова рыбы");
 
     mainMenuLayout.addWidget(&userList);
     mainMenuLayout.addWidget(&selectButton);

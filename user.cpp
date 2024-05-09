@@ -44,14 +44,14 @@ User::User(QString role)
 {
     if (role == "fish catch registrator")
     {
-        availTables.append("bank");
-        availTables.append("fish");
-        availTables.append("fishCatch");
-        availTables.append("fishingSessionRes");
-        availTables.append("voyage");
+        availTables.append("Банки");
+        availTables.append("Рыба");
+        availTables.append("Уловы рыбы");
+        availTables.append("Учет рыболовных сессий");
+        availTables.append("Рейсы");
 
-        ReportGroup* bankGroup = new ReportGroup("bank");
-        bankGroup->insertReport("Вывести информацию о всех банках",QStringList(),"select * from bank;");
+        ReportGroup* bankGroup = new ReportGroup("Банки");
+        bankGroup->insertReport("Вывести информацию о всех банках",QStringList(),"select BNum as 'Номер банки', BName as 'Название банки', Cords as 'Координаты расположения' from bank;");
         bankGroup->insertReport("Запрос на получение списка членов экипажа с определенного рейса",
                                 QStringList() << "Введите номер рейса",
                                 "select CNum as 'Номер члена экипажа', CName as 'ФИО' from crew where VNum = :vnum ;",
@@ -67,7 +67,7 @@ User::User(QString role)
                                 );
         bankGroup->insertReport("Запрос на получение суммарного улова за всей рейсы, в которые траулеры вышли в определенный период",
                                 QStringList() << "Введите дату отплытия" << "Введите дату возвращения ",
-                               " select VDate as 'Дата отправления', Retdate as 'Дата прибытия', sum(fishQuantity) as 'Суммарное количество пойманной рыбы' , trawler.TName"
+                               " select VDate as 'Дата отправления', Retdate as 'Дата прибытия', sum(fishQuantity) as 'Суммарное количество пойманной рыбы' , trawler.TName as 'Название траулера'"
                                    " from voyage, fishCatch, trawler "
                                     "where fishCatch.resNum in (select resNum from fishingSessionRes where DepDate between :vdate and :rdate ) "
                                         "and voyage.VDate between :vdate and :rdate "
@@ -95,7 +95,7 @@ User::User(QString role)
 
             //                         )
 
-        ReportGroup* fishGroup = new ReportGroup("fish");
+        ReportGroup* fishGroup = new ReportGroup("Рыбы");
         fishGroup->insertReport("Вывести информацию о всей рыбе",QStringList(),"select * from fish;");
         fishGroup->insertReport("Запрос на получение списка членов экипажа с определенного рейса",
                                 QStringList() << "Введите номер рейса",
@@ -128,18 +128,18 @@ User::User(QString role)
                                 "select FishName as 'Название рыбы', sum(fishQuantity) as 'Количество выловленных особей за все время' "
                                 "        where FishName = 'Pike';"
                                 );
-        ReportGroup* fishCatchGroup = new ReportGroup("fishCatch");
+        ReportGroup* fishCatchGroup = new ReportGroup("Уловы рыбы");
         fishCatchGroup->insertReport("Вывести всю таблицу уловов",
                                      QStringList(),
                                      "select * from fishCatch;"
                                      );
 
-        ReportGroup* fishingSessionResGroup = new ReportGroup("fishingSessionRes");
+        ReportGroup* fishingSessionResGroup = new ReportGroup("Учет рыболовных сессий");
         fishingSessionResGroup->insertReport("Вывести всю таблицу промежуточных рыбаловных сессий",
                                      QStringList(),
                                      "select * from fishingSessionRes;"
                                      );
-        ReportGroup* voyageGroup = new ReportGroup("voyage");
+        ReportGroup* voyageGroup = new ReportGroup("Рейсы");
         voyageGroup->insertReport("Вывести всю таблицу рейсов",
                                           QStringList(),
                                           "select * from voyage;"

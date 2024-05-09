@@ -9,6 +9,7 @@ void ParamsEnterWidget::emitParamsEntered()
     }
     emit paramsEntered(enteredParams);
 
+
 }
 
 void ParamsEnterWidget::closeEvent(QCloseEvent *event)
