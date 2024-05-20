@@ -19,7 +19,6 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
 )
-
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(BD_lab
         MANUAL_FINALIZATION
@@ -32,6 +31,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         reportgroup.h reportgroup.cpp
         paramsenterwidget.h paramsenterwidget.cpp
         addwindow.h addwindow.cpp
+        editwindow.h editwindow.cpp
+        rowsfordeletewindow.h rowsfordeletewindow.cpp
+        rowstodeletewindow.h rowstodeletewindow.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

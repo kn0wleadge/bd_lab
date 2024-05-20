@@ -9,8 +9,8 @@ SelectTab::SelectTab()
         initDatabase();
     if (SelectTab::columnsNameDictionary.empty())
         initColumnsNameDictionary();
-    tablesSelectLabel.setText("Выберите таблицу");
-    this->selectLayout.addWidget(&tablesSelectLabel,0,0);
+    tablesSelectLabel.setText("Текущая таблица");
+    tablesSelectLabel.setFixedSize(140,20);
 
     user = new User("fish catch registrator");
     //getting columns data types for users' available types
@@ -46,21 +46,21 @@ SelectTab::SelectTab()
         }
         else if(user->getAvailTables()[i] == "Учет рыболовных сессий")
         {
-            QString tableName = "Учет рыболовный сессий";
+            QString tableName = "Учет рыболовных сессий";
             QStringList columnType;
-            columnType << "int" << "int" << "str" << "str" << "str" << "int";
+            columnType << "int" << "int" << "str" << "str" << "int";;
             columnsDataTypes.append(std::pair(tableName, columnType));
         }
-        else if(user->getAvailTables()[i] == "Траулеры")
+        else if(user->getAvailTables()[i] == "Траулер")
         {
-            QString tableName = "Траулеры";
+            QString tableName = "Траулер";
             QStringList columnType;
             columnType << "int" << "str" << "int" << "str";
             columnsDataTypes.append(std::pair(tableName, columnType));
         }
-        else if(user->getAvailTables()[i] == "Рейсы")
+        else if(user->getAvailTables()[i] == "Рейс")
         {
-            QString tableName = "Рейсы";
+            QString tableName = "Рейс";
             QStringList columnType;
             columnType << "int" << "int" << "str" << "str";
             columnsDataTypes.append(std::pair(tableName, columnType));
@@ -76,13 +76,23 @@ SelectTab::SelectTab()
 
     tables = new QComboBox;
     tables->addItems(user->getAvailTables());
-    this->selectLayout.addWidget(tables,1,0);
+
+    //this->selectLayout.addLayout(tableLabelAndCurrentTable,0,0);
+    QHBoxLayout* newLayout = new QHBoxLayout;
+    newLayout->addWidget(&tablesSelectLabel);
+    newLayout->setSpacing(0);
+    newLayout->addWidget(tables);
+
+    newLayout->setAlignment(Qt::AlignLeft);
+    // this->selectLayout.addWidget(&tablesSelectLabel,0,0);
+    // this->selectLayout.addWidget(tables,0,0);
+    this->selectLayout.addLayout(newLayout,0,0);
     qDebug()<<"created user";
     paramsQuery = new QSqlQuery(db);
     model = new QSqlQueryModel;
 
     reports = new QComboBox;
-    setNewReports("Банки");
+    setNewReports("Банка");
     recallQuery = new QPushButton;
     recallQuery->setIcon(QIcon("recallQuery.ico"));
     recallQuery->setText("R");
@@ -90,23 +100,23 @@ SelectTab::SelectTab()
 
     qDebug()<<"added reports";
     QHBoxLayout* reportsAndButton = new QHBoxLayout;
+    QLabel* currentQuery = new QLabel("Текущий запрос");
+    reportsAndButton->addWidget(currentQuery);
     reportsAndButton->addWidget(reports);
     reportsAndButton->addWidget(recallQuery);
-    this->selectLayout.addLayout(reportsAndButton,2,0);
+    this->selectLayout.addLayout(reportsAndButton,1,0);
 
     //button for opening add/edit/delete window
-    QPushButton* addButton = new QPushButton("Добавить новую запись");
-    this->selectLayout.addWidget(addButton,3,0);
-
-
+    QPushButton* addButton = new QPushButton;
+    addButton->setText("Добавить новую запись");
+    this->selectLayout.addWidget(addButton,2,0);
     bdView = new QTableView;
     bdView->setModel(model);
     bdView->verticalHeader()->hide();
     bdView->setColumnWidth(0,150);
 
-    this->selectLayout.addWidget(bdView);
+    this->selectLayout.addWidget(bdView,4,0);
     this->setLayout(&selectLayout);
-
 
     qDebug()<<"started connections";
     connect(tables, &QComboBox::currentTextChanged, this, &SelectTab::tableChanged);
@@ -116,6 +126,8 @@ SelectTab::SelectTab()
     connect(this, &SelectTab::queryRecalled, this, &SelectTab::reportChanged);
     connect(addButton, &QPushButton::clicked, this, &SelectTab::emitOpenAddWindow);
     connect(this, &SelectTab::addWindowButtonClicked, this, &SelectTab::openAddWindow);
+
+    connect(this, &SelectTab::editWindowOpen, this, &SelectTab::openEditWindow);
 
     qDebug()<<"tab created";
 }
@@ -135,7 +147,14 @@ void SelectTab::reportChanged(int n)
     //if it's real query
     if (n != -1)
     {
-
+        if (n == 0  && this->tables->currentText() != "Рейс")
+        {
+                connect(this->bdView, &QTableView::doubleClicked, this, &SelectTab::tableDoubleClicked);
+        }
+        else
+        {
+            disconnect(this->bdView, &QTableView::doubleClicked, this, &SelectTab::tableDoubleClicked);
+        }
     QVector<Report*> reports;
 
     //looking throw all report groups and get current reports
@@ -146,6 +165,7 @@ void SelectTab::reportChanged(int n)
             reports = e->getReports();
         }
     }
+
 
     //get report's data-input guides
     QStringList newReportInputGuides = reports[n]->getGuide();
@@ -163,6 +183,7 @@ void SelectTab::reportChanged(int n)
     //if there are no params in query - execute it instantly
     else
     {
+        qDebug() << reports[n]->getSql();
         this->model->setQuery(reports[n]->getSql());
         //getting first row in model to get quantity of columns
         // QSqlRecord tempRecord = this->model->record(0);
@@ -177,10 +198,17 @@ void SelectTab::reportChanged(int n)
         qDebug()<<reports[n]->getSql();
        // qDebug() << "headers" << strList;
         qDebug()<<"0 params query executed";
+        qDebug() << this->model->lastError();
     }
 
-    update();
+
     }
+    else
+    {
+        disconnect(this->bdView, &QTableView::doubleClicked, this, &SelectTab::tableDoubleClicked);
+
+    }
+    update();
 }
 
 void SelectTab::emitTableChanged(int n)
@@ -268,11 +296,85 @@ void SelectTab::openAddWindow(QString currentTableName)
     for (size_t i = 0; i < tempRecord.count(); ++i)
     {
        // columnNames << engColumnNameToRus(tempRecord.fieldName(i));
-         columnNames << tempRecord.fieldName(i);
+        columnNames << engColumnNameToRus(tempRecord.fieldName(i));
     }
     addWindow = new AddWindow(columnNames);
     connect(addWindow, &AddWindow::valuesEntered, this, &SelectTab::insertNewRow);
     addWindow->show();
+}
+
+void SelectTab::editRow(QStringList newValues)
+{
+    if (this->tables->currentText() == "Банка")
+    {
+        this->model->setQuery("update bank set BName = '" + newValues[1] + "', Cords = '" + newValues[2] + "' where BNum = " + newValues[0] + ";");
+    }
+    else if (this->tables->currentText() == "Рыба")
+    {
+        this->model->setQuery("update fish set Quantity = " + newValues[2] +  "where BNum = " + newValues[1] + ", FishName = '" + newValues[0] + "';");
+
+    }
+    else if (this->tables->currentText() == "Улов рыбы")
+    {
+        this->model->setQuery("update fishCatch set fishQuantity = " + newValues[2] + ",fishQuality = '" + newValues[3] + "', where FishName = '" + newValues[0] + "', resNum = '" + newValues[1] + "';");
+
+    }
+    else if (this->tables->currentText() == "Учет рыбаловных сессий")
+    {
+        this->model->setQuery("update fishingSessionRes set BNum = " + newValues[1] + ", DepDate = '" + newValues[2] + "', RetDate = " + newValues[3]+ ", VNum = '" + newValues[4] + "' where resNum = " + newValues[0]);
+
+    }
+    else if (this->tables->currentText() == "Рейс")
+    {
+        this->model->setQuery("update voyage set Tnum = " + newValues[1] + ", Vdate = '" + newValues[2]+ "', Retdate = '" + newValues[3] + "' where VNum = " + newValues[0]);
+
+    }
+
+    qDebug()<< this->model->lastError();
+}
+
+void SelectTab::deleteRow()
+{
+    QSqlRecord record = deletingRow;
+    if (this->tables->currentText() == "Банка")
+    {
+        qDebug()<< "BNum from deleted row - "<< record.value(0).toString();
+        this->model->setQuery("delete from fishCatch where FishName in (select FishName from fish where BNum = " + record.value(0).toString() + ");");
+        qDebug()<< this->model->lastError();
+        this->model->setQuery("delete from fishingSessionRes where BNum = " + record.value(0).toString() + ";");
+        qDebug()<< this->model->lastError();
+        this->model->setQuery("delete from fish where BNum = " + record.value(0).toString() + ";");
+        qDebug()<< this->model->lastError();
+        this->model->setQuery("delete from bank where BNum = " + record.value(0).toString() + ";");
+        qDebug()<< this->model->lastError();
+    }
+    else if (this->tables->currentText() == "Рыба")
+    {
+        qDebug() << record.value(0).toString();
+        this->model->setQuery("delete from fishCatch where fishCatch.FishName ='" + record.value(0).toString() + "'and fishCatch.resNum in (select fishingSessionRes.resNum from fishingSessionRes where fishingSessionRes.BNum = (select BNum from bank where BName = '" + record.value(2).toString()+  "'));");
+        qDebug() << this->model->lastError();
+        this->model->setQuery("delete from fish where BNum = (select BNum from bank where BName = '" + record.value(2).toString()+  "')" + " and FishName = '" + record.value(0).toString() + "';");
+        qDebug() << this->model->lastError();
+    }
+    else if (this->tables->currentText() == "Улов рыбы")
+    {
+        this->model->setQuery("delete from fishCatch where FishName = '" + record.value(0).toString() + "'and resNum = '" +  record.value(1).toString() + "';");
+    }
+    else if (this->tables->currentText() == "Учет рыболовных сессий")
+    {
+        this->model->setQuery("delete from fishCatch where resNum = " + record.value(0).toString() + ";");
+        this->model->setQuery("delete from fishingSessioNres where resNum = " + record.value(0).toString());
+    }
+    else if (this->tables->currentText() == "Рейс")
+    {
+        int n =QMessageBox::critical(0,
+                                     "Вы не можете удалить эту запись",
+                                     "Обратитесь к администратору базы данных",
+
+                                     QMessageBox::Ok
+                                     );
+    }
+    qDebug()<< "raw deleted"<<this->model->lastError();
 }
 
 void SelectTab::insertNewRow(QStringList values)
@@ -291,21 +393,25 @@ void SelectTab::insertNewRow(QStringList values)
                 break;
             }
         }
+        qDebug() << "quantity of columns" << columnsTypes.size();
+        qDebug()<< "creating query";
         QString insertQueryText = "insert into " +
                                   rusTableNameToEng(this->tables->currentText())
                                   + " values (";
+        qDebug() << "query created";
         //iterating throw all values
-        for (size_t i = 0; i < values.size();++i)
+        for (size_t i = 0; i < values.size(); ++i)
         {
             if (columnsTypes[i] == "str")
             {
-                insertQueryText.push_back("' " + values[i] + " '" + ",");
+                insertQueryText.push_back("'" + values[i] + "'" + " ,");
             }
             else if(columnsTypes[i] == "int")
             {
-                insertQueryText.push_back(values[i] + + " , ");
+                insertQueryText.push_back(values[i] + + " ,");
             }
         }
+        qDebug() << "get values types";
         insertQueryText.removeLast();
         insertQueryText.push_back(");");
         qDebug()<<insertQueryText;
@@ -373,7 +479,7 @@ void SelectTab::initColumnsNameDictionary()
 
     //voyage table
     SelectTab::columnsNameDictionary.insert({"VNum","Номер рейса"});
-    SelectTab::columnsNameDictionary.insert({"TNum","Номер траулера"});
+    SelectTab::columnsNameDictionary.insert({"Tnum","Номер траулера"});
     SelectTab::columnsNameDictionary.insert({"Vdate","Дата выхода в рейс"});
     SelectTab::columnsNameDictionary.insert({"Retdate","Дата прибытия с рейса"});
 
@@ -389,19 +495,19 @@ QString SelectTab::rusTableNameToEng(QString tName)
      *
      * @return string
      */
-    if (tName == "Банки")
+    if (tName == "Банка")
         return "bank";
     else if (tName == "Рыба")
         return "fish";
-    else if (tName == "Уловы рыбы")
+    else if (tName == "Улов рыбы")
         return "fishCatch";
     else if (tName == "Учет рыболовных сессий")
         return "fishingSessionRes";
-    else if (tName == "Рейсы")
+    else if (tName == "Рейс")
         return "voyage";
-    else if (tName == "Работники")
+    else if (tName == "Работник")
         return "employee";
-    else if (tName == "Траулеры")
+    else if (tName == "Траулер")
         return "trawler";
     else if (tName == "Экипаж рейса")
         return "voyageCrew";
@@ -422,6 +528,73 @@ void SelectTab::emitQueryRecalled(int n)
 void SelectTab::emitOpenAddWindow()
 {
     emit this->addWindowButtonClicked(this->tables->currentText());
+}
+
+void SelectTab::tableDoubleClicked(const QModelIndex& index)
+{
+    QStringList currentParams;
+    int n = index.row();
+    currentSelectedRow = n;
+    qDebug() << n << "row clicked";
+    QSqlRecord record = this->model->record(n);
+    deletingRow = this->model->record(n);
+    qDebug()<<"getting values from row";
+    for (size_t i = 0; i < record.count(); ++i)
+    {
+        currentParams << record.value(i).toString();
+    }
+    qDebug() << "getting column names";
+    QStringList columnNames;
+    for (size_t i = 0; i < record.count(); ++i)
+    {
+        columnNames << record.fieldName(i);
+    }
+    qDebug()<<"emiting 'open window'";
+    emit editWindowOpen(currentParams, columnNames);
+}
+
+void SelectTab::openEditWindow(QStringList values, QStringList columnsNames)
+{
+    if (this->tables->currentText() == "Банка")
+    {
+        this->model->setQuery("select * from fish where BNum = " + values[0] + ";");
+        qDebug()<< this->model->lastError();
+    }
+    else if (this->tables->currentText() == "Рыба")
+    {
+        qDebug() << values[0] << values [1];
+        this->model->setQuery("select * from fishCatch where fishCatch.FishName = '" + values[0] + "' AND fishCatch.resNum in (select fishingSessionRes.resNum from fishingSessionRes where BNum = (select BNum from bank where BName = '" + values[2] + "'));");
+        qDebug()<< this->model->lastError();
+
+    }
+    else if (this->tables->currentText() == "Улов рыбы")
+    {
+    }
+    else if (this->tables->currentText() == "Учет рыболовных сессий")
+    {
+        this->model->setQuery("select * from fishCatch where resNum = " + values[0] + ";");
+
+    }
+    else if (this->tables->currentText() == "Рейс")
+    {
+        int n =QMessageBox::critical(0,
+                                      "Вы не можете изменять эту запись",
+                                      "Обратитесь к администратору базы данных",
+
+                                      QMessageBox::Ok
+                                      );
+    }
+    for (size_t i = 0; i < this->model->columnCount(); ++i)
+    {
+
+        this->model->setHeaderData(i,Qt::Orientation::Horizontal,
+                                   engColumnNameToRus(this->model->headerData(i,Qt::Orientation::Horizontal).toString()));
+    }
+    EditWindow* newEditWindow = new EditWindow(values, columnsNames, this->model);
+    connect(newEditWindow, &EditWindow::changesSubmited, this, &SelectTab::editRow);
+    connect(newEditWindow, &EditWindow::callDeleteRow, this,&SelectTab::deleteRow);
+
+    newEditWindow->show();
 }
 void SelectTab::initDatabase()
 {

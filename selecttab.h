@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include "paramsenterwidget.h"
 #include "addwindow.h"
+#include "editwindow.h"
+
 #include <QThread>
 //под одну категорию пользователей
 class SelectTab:public QWidget
@@ -18,18 +20,29 @@ private slots:
     void executeQuery(QStringList paramsList);
     void openAddWindow(QString currentTableName);
 
+    void editRow(QStringList newValues);
+    void deleteRow();
+
     void emitTableChanged(int n);
     void emitQueryRecalled(int n);
     void emitOpenAddWindow();
+    void tableDoubleClicked(const QModelIndex& index);
+    void openEditWindow(QStringList values, QStringList columnsNames);
+
 
     void insertNewRow(QStringList values);
 signals:
     void addWindowButtonClicked(QString currentTableName);
     void newTablePicked(int n,QString newTableName);
     void queryRecalled(int n);
+    void editWindowOpen(QStringList values, QStringList columnsNames);
+
 
 private:
     static std::unordered_map<QString,QString> columnsNameDictionary;
+
+    int currentSelectedRow;
+
     void initColumnsNameDictionary();
     QString rusTableNameToEng(QString cName);
     QString engColumnNameToRus(QString cName);
@@ -57,7 +70,7 @@ private:
     static QSqlDatabase db;
 
     QStringList columnsNames;
-
+    QSqlRecord deletingRow;
     QPushButton* recallQuery;
     void setNewReports(QString name);
     void setNewTable(QString name);

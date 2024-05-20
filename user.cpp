@@ -44,13 +44,13 @@ User::User(QString role)
 {
     if (role == "fish catch registrator")
     {
-        availTables.append("Банки");
+        availTables.append("Банка");
         availTables.append("Рыба");
-        availTables.append("Уловы рыбы");
+        availTables.append("Улов рыбы");
         availTables.append("Учет рыболовных сессий");
-        availTables.append("Рейсы");
+        availTables.append("Рейс");
 
-        ReportGroup* bankGroup = new ReportGroup("Банки");
+        ReportGroup* bankGroup = new ReportGroup("Банка");
         bankGroup->insertReport("Вывести информацию о всех банках",QStringList(),"select BNum as 'Номер банки', BName as 'Название банки', Cords as 'Координаты расположения' from bank;");
         bankGroup->insertReport("Запрос на получение списка членов экипажа с определенного рейса",
                                 QStringList() << "Введите номер рейса",
@@ -78,7 +78,7 @@ User::User(QString role)
                                 );
         bankGroup->insertReport("Запрос на самую получение информации о рыбе, которая распространена больше всего в определенной банке",
                                 QStringList() << "Введите название банки",
-                                "select FishName as 'Название рыбы',Quantity as 'Количество рыбы', BName as'Название банки' "
+                                "select FishName as 'Название рыбы',Quantity as 'Количество рыбы, шт.', BName as'Название банки' "
                                 "from fish, bank "
                                     "where fish.BNum = bank.BNum "
                                       "and bank.BName = :bname "
@@ -95,8 +95,10 @@ User::User(QString role)
 
             //                         )
 
-        ReportGroup* fishGroup = new ReportGroup("Рыбы");
-        fishGroup->insertReport("Вывести информацию о всей рыбе",QStringList(),"select * from fish;");
+        ReportGroup* fishGroup = new ReportGroup("Рыба");
+        fishGroup->insertReport("Вывести информацию о всей рыбе",
+                                QStringList(),
+                                "select fish.FishName as 'Название рыбы', fish.Quantity as 'Количество рыбы', bank.BName as 'Название банки', bank.Cords as 'Координаты расположения' from fish, bank where bank.BNum = fish.BNum;");
         fishGroup->insertReport("Запрос на получение списка членов экипажа с определенного рейса",
                                 QStringList() << "Введите номер рейса",
                                 "select CNum as 'Номер члена экипажа', CName as 'ФИО' from crew where VNum = 3 ;"
@@ -128,7 +130,7 @@ User::User(QString role)
                                 "select FishName as 'Название рыбы', sum(fishQuantity) as 'Количество выловленных особей за все время' "
                                 "        where FishName = 'Pike';"
                                 );
-        ReportGroup* fishCatchGroup = new ReportGroup("Уловы рыбы");
+        ReportGroup* fishCatchGroup = new ReportGroup("Улов рыбы");
         fishCatchGroup->insertReport("Вывести всю таблицу уловов",
                                      QStringList(),
                                      "select * from fishCatch;"
@@ -137,9 +139,9 @@ User::User(QString role)
         ReportGroup* fishingSessionResGroup = new ReportGroup("Учет рыболовных сессий");
         fishingSessionResGroup->insertReport("Вывести всю таблицу промежуточных рыбаловных сессий",
                                      QStringList(),
-                                     "select * from fishingSessionRes;"
+                                     "select resNum as 'Номер учетной сессии', BNum as 'Номер банки', DepDate as 'Дата отплытия', RetDate as 'Дата возвращения', VNum as 'Номер рейса'  from fishingSessionRes;"
                                      );
-        ReportGroup* voyageGroup = new ReportGroup("Рейсы");
+        ReportGroup* voyageGroup = new ReportGroup("Рейс");
         voyageGroup->insertReport("Вывести всю таблицу рейсов",
                                           QStringList(),
                                           "select * from voyage;"

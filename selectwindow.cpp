@@ -10,7 +10,7 @@ void SelectWindow::createNewTab(int n)
         SelectTab* newTab = new SelectTab;
         connect(newTab, &SelectTab::newTablePicked, this, &SelectWindow::tablesNameChanged);
 
-        this->addTab(newTab," Банк ");
+        this->addTab(newTab," Банка");
         disconnect(this, &SelectWindow::currentChanged, this,&SelectWindow::createNewTab);
         this->tabBar()->moveTab(this->count()-1, this->count() - 2);
         this->setCurrentIndex(this->count() - 2);
